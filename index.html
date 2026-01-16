@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe From Harm</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        ios: {
+                            bg: '#F5F5F7',
+                            card: '#FFFFFF',
+                            text: '#1D1D1F',
+                            blue: '#0071E3',
+                            red: '#FF3B30', // Apple Red
+                            green: '#34C759'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 8px 30px rgba(0,0,0,0.04)',
+                        'hover': '0 20px 40px rgba(0,0,0,0.08)'
+                    },
+                    animation: {
+                        'enter': 'enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        enter: {
+                            '0%': { opacity: '0', transform: 'scale(0.98) translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F5F5F7; color: #1D1D1F; -webkit-font-smoothing: antialiased; }
+        .hidden-screen { display: none !important; }
+        
+        .mac-input {
+            background: #F5F5F7;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .mac-input:focus {
+            background: #FFFFFF;
+            border-color: #0071E3;
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+        }
+        .mac-btn:active { transform: scale(0.96); }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center relative overflow-hidden">
+
+    <div id="toast-container" class="fixed top-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <div class="w-full max-w-[420px] p-6">
+        
+        <div id="screen-auth" class="bg-ios-card rounded-[32px] p-10 shadow-soft animate-enter relative">
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-lg">⚜️</div>
+                <h1 class="text-2xl font-bold tracking-tight">Safe From Harm</h1>
+                <p class="text-gray-400 text-sm font-medium mt-1">Sign in to start your journey</p>
+            </div>
+
+            <form id="login-form" class="space-y-4">
+                <input type="email" id="login-email" class="mac-input w-full px-5 py-4 rounded-full outline-none font-medium text-sm" placeholder="Email Address" required>
+                <div class="relative">
+                    <input type="password" id="login-password" class="mac-input w-full px-5 py-4 rounded-full outline-none font-medium text-sm" placeholder="Password" required>
+                    <button type="button" onclick="togglePassword('login-password', this)" class="absolute right-4 top-4 text-gray-400 hover:text-black transition">
+                        <i data-lucide="eye" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <button type="submit" id="btn-login" class="mac-btn w-full bg-black text-white py-4 rounded-full font-bold text-base shadow-lg hover:shadow-hover transition-all">Sign In</button>
+                <p class="text-center text-xs text-gray-400 mt-4 font-medium">New here? <a href="#" onclick="toggleAuth('register')" class="text-ios-blue hover:underline">Create Account</a></p>
+            </form>
+
+            <form id="register-form" class="space-y-4 hidden">
+                <input type="text" id="reg-name" class="mac-input w-full px-5 py-4 rounded-full outline-none font-medium text-sm" placeholder="Full Name" required>
+                <input type="email" id="reg-email" class="mac-input w-full px-5 py-4 rounded-full outline-none font-medium text-sm" placeholder="Email Address" required>
+                <input type="password" id="reg-password" class="mac-input w-full px-5 py-4 rounded-full outline-none font-medium text-sm" placeholder="Password (Min 6)" required>
+                <div class="flex bg-gray-100 p-1 rounded-full">
+                    <label class="flex-1 cursor-pointer"><input type="radio" name="role" value="scout" class="peer sr-only" checked><div class="py-2 text-center text-xs font-bold text-gray-400 rounded-full peer-checked:bg-white peer-checked:text-black peer-checked:shadow-sm transition-all">SCOUT</div></label>
+                    <label class="flex-1 cursor-pointer"><input type="radio" name="role" value="leader" class="peer sr-only"><div class="py-2 text-center text-xs font-bold text-gray-400 rounded-full peer-checked:bg-white peer-checked:text-black peer-checked:shadow-sm transition-all">LEADER</div></label>
+                    <label class="flex-1 cursor-pointer"><input type="radio" name="role" value="rover" class="peer sr-only"><div class="py-2 text-center text-xs font-bold text-gray-400 rounded-full peer-checked:bg-white peer-checked:text-black peer-checked:shadow-sm transition-all">ROVER</div></label>
+                </div>
+                <button type="submit" id="btn-register" class="mac-btn w-full bg-black text-white py-4 rounded-full font-bold text-base shadow-lg hover:shadow-hover transition-all">Create Account</button>
+                <p class="text-center text-xs text-gray-400 mt-4 font-medium">Have an account? <a href="#" onclick="toggleAuth('login')" class="text-ios-blue hover:underline">Sign In</a></p>
+            </form>
+        </div>
+
+        <div id="screen-dashboard" class="bg-ios-card rounded-[32px] p-8 shadow-soft animate-enter hidden-screen text-center relative">
+            <button onclick="handleGlobalLogout()" class="absolute top-6 right-6 p-2 rounded-full bg-red-50 text-ios-red hover:bg-red-100 transition-colors mac-btn" title="Log Out">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+            </button>
+
+            <div class="w-24 h-24 bg-gradient-to-b from-blue-50 to-white rounded-full mx-auto flex items-center justify-center text-5xl mb-6 shadow-sm border border-gray-100">👋</div>
+            <h2 class="text-2xl font-bold mb-1" id="dash-name">Hello</h2>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-8" id="dash-role">LOADING...</p>
+            <div id="dash-content" class="space-y-3"></div>
+        </div>
+
+        <div id="screen-language" class="bg-ios-card rounded-[32px] p-8 shadow-soft animate-enter hidden-screen">
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-bold mb-2">Select Language</h2>
+                <p class="text-sm text-gray-400">ඔබ කැමති භාෂාව තෝරන්න</p>
+            </div>
+            <div class="space-y-3">
+                <button onclick="launchQuiz('si')" class="mac-btn w-full bg-[#FFDA57] text-black py-5 rounded-2xl font-bold text-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-3">සිංහල</button>
+                <button onclick="launchQuiz('en')" class="mac-btn w-full bg-black text-white py-5 rounded-2xl font-bold text-lg shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-3">English</button>
+            </div>
+            <button onclick="showScreen('screen-dashboard')" class="mac-btn w-full mt-4 py-4 rounded-full font-bold text-sm text-gray-500 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
+            </button>
+        </div>
+
+        <div id="screen-quiz" class="bg-ios-card rounded-[32px] shadow-soft animate-enter hidden-screen overflow-hidden relative">
+            <div class="h-1 w-full bg-gray-100"><div id="quiz-progress" class="h-full bg-ios-blue transition-all duration-500 rounded-r-full" style="width: 0%"></div></div>
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <span class="text-[10px] font-bold text-gray-400 bg-gray-50 px-3 py-1 rounded-full border border-gray-100" id="q-counter">Q 1/15</span>
+                    <span class="text-sm font-bold text-ios-blue font-mono tabular-nums" id="timer-text">04:00</span>
+                </div>
+                <div id="quiz-content-wrapper" class="min-h-[300px] flex flex-col justify-between">
+                    <h2 id="q-text" class="text-xl font-bold leading-relaxed mb-8">Loading...</h2>
+                    <div id="answers-container" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-result" class="bg-ios-card rounded-[32px] p-10 shadow-soft animate-enter hidden-screen text-center">
+            <div id="res-icon" class="text-7xl mb-6">🎉</div>
+            <h2 id="res-title" class="text-2xl font-bold mb-2">Completed!</h2>
+            <p id="res-msg" class="text-gray-500 text-sm mb-8">Your results</p>
+            <div class="bg-gray-50 rounded-2xl p-6 mb-8 border border-gray-100">
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Score</span>
+                <div id="res-score" class="text-5xl font-bold text-black mt-2 tracking-tight">0</div>
+            </div>
+            <div id="res-actions" class="space-y-3"></div>
+        </div>
+
+    </div>
+
+    <div class="fixed bottom-6 text-center pointer-events-none z-40 opacity-60">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Designed by Madhawa Basnayake</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, child, update, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // 🔴 PASTE YOUR FIREBASE CONFIG HERE 🔴
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSl1cirj-EoccG33hDP8U2c-LoS-ax1aQ",
+            authDomain: "sfh-kegalle.firebaseapp.com",
+            databaseURL: "https://sfh-kegalle-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sfh-kegalle",
+            storageBucket: "sfh-kegalle.firebasestorage.app",
+            messagingSenderId: "195425936198",
+            appId: "1:195425936198:web:502fc46c9ec61ec2babb47"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // EXPORTS
+        window.handleGlobalLogout = async () => {
+            await signOut(auth);
+            location.reload();
+        };
+
+        window.toggleAuth = (mode) => {
+            document.getElementById('login-form').classList.toggle('hidden', mode === 'register');
+            document.getElementById('register-form').classList.toggle('hidden', mode !== 'register');
+        };
+
+        window.togglePassword = (id, btn) => {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+            btn.classList.toggle('text-black');
+        };
+
+        // STATE & AUDIO
+        const audio = {
+            success: new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3'),
+            error: new Audio('https://assets.mixkit.co/active_storage/sfx/2902/2902-preview.mp3')
+        };
+        let state = { userData: null, currentUser: null, lang: 'en', questions: [], qIndex: 0, score: 0, timer: null, timeLeft: 240 };
+
+        // HELPERS
+        window.showScreen = (id) => {
+            document.querySelectorAll('[id^="screen-"]').forEach(el => el.classList.add('hidden-screen'));
+            const target = document.getElementById(id);
+            target.classList.remove('hidden-screen');
+            target.style.animation = 'none'; target.offsetHeight; target.style.animation = null; 
+        };
+
+        const showToast = (msg, type = 'success') => {
+            const box = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = `mx-auto bg-black text-white px-6 py-3 rounded-full shadow-2xl text-sm font-bold flex items-center gap-2 animate-enter ${type === 'error' ? 'bg-red-500' : ''}`;
+            el.innerHTML = msg; box.appendChild(el); setTimeout(() => el.remove(), 3000);
+        };
+
+        const getFriendlyError = (err) => {
+            if (err.code === 'auth/invalid-credential') return 'Incorrect email or password';
+            if (err.code === 'auth/email-already-in-use') return 'Email already registered';
+            if (err.code === 'auth/weak-password') return 'Password too short';
+            if (err.message.includes('offline')) return 'No internet connection';
+            return 'Something went wrong';
+        };
+
+        // INIT
+        window.addEventListener('load', () => {
+            lucide.createIcons();
+            signOut(auth); 
+            window.showScreen('screen-auth');
+        });
+
+        // AUTH
+        const handleAuthAction = async (formId) => {
+            const btn = document.querySelector(`#${formId} button[type="submit"]`);
+            const originalText = btn.innerText;
+            btn.innerText = "Processing..."; btn.disabled = true;
+            try {
+                if (formId === 'register-form') {
+                    const name = document.getElementById('reg-name').value;
+                    const email = document.getElementById('reg-email').value;
+                    const pass = document.getElementById('reg-password').value;
+                    const role = document.querySelector('input[name="role"]:checked').value;
+                    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                    await updateProfile(cred.user, { displayName: name });
+                    await set(ref(db, `users/${cred.user.uid}`), { uid: cred.user.uid, name, email, role, examStatus: 'pending', attempts: 0 });
+                    await signOut(auth);
+                    showToast('Account created! Log in now.');
+                    window.toggleAuth('login');
+                } else {
+                    const email = document.getElementById('login-email').value;
+                    const pass = document.getElementById('login-password').value;
+                    const cred = await signInWithEmailAndPassword(auth, email, pass);
+                    const snapshot = await get(child(ref(db), `users/${cred.user.uid}`));
+                    if (!snapshot.exists()) throw new Error({code: 'custom', message: 'User data not found'});
+                    state.userData = snapshot.val();
+                    state.currentUser = cred.user;
+                    renderDashboard();
+                    showToast(`Welcome, ${state.userData.name.split(' ')[0]}`);
+                }
+            } catch (err) { showToast(getFriendlyError(err), 'error'); } 
+            finally { btn.innerText = originalText; btn.disabled = false; }
+        };
+        document.getElementById('login-form').addEventListener('submit', (e) => { e.preventDefault(); handleAuthAction('login-form'); });
+        document.getElementById('register-form').addEventListener('submit', (e) => { e.preventDefault(); handleAuthAction('register-form'); });
+
+        // DASHBOARD
+        const renderDashboard = () => {
+            document.getElementById('dash-name').innerText = `Hello, ${state.userData.name.split(' ')[0]}`;
+            document.getElementById('dash-role').innerText = state.userData.role.toUpperCase();
+            const content = document.getElementById('dash-content');
+            
+            if (state.userData.examStatus === 'passed') {
+                content.innerHTML = `
+                    <div class="bg-green-50 text-green-700 p-4 rounded-2xl text-sm font-medium border border-green-100 mb-4 text-left">
+                        <div class="flex items-center gap-2 mb-1"><i data-lucide="check-circle" class="w-4 h-4"></i><span class="font-bold">Certified</span></div>
+                        <p class="opacity-80">You have successfully completed the assessment.</p>
+                    </div>
+                    <button onclick="generateCertificate()" class="mac-btn w-full bg-black text-white py-4 rounded-2xl font-bold shadow-lg flex items-center justify-center gap-2"><span>Download Certificate</span><i data-lucide="download" class="w-4 h-4"></i></button>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="bg-white border border-gray-100 p-4 rounded-2xl mb-6 text-left space-y-3 shadow-sm">
+                        <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center"><i data-lucide="help-circle" class="w-4 h-4"></i></div><div><p class="text-xs font-bold text-gray-800">15 Questions</p><p class="text-[10px] text-gray-400">Randomly selected</p></div></div>
+                        <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center"><i data-lucide="clock" class="w-4 h-4"></i></div><div><p class="text-xs font-bold text-gray-800">4 Minutes</p><p class="text-[10px] text-gray-400">To complete the quiz</p></div></div>
+                        <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center"><i data-lucide="award" class="w-4 h-4"></i></div><div><p class="text-xs font-bold text-gray-800">Pass Mark: 12</p><p class="text-[10px] text-gray-400">Correct answers needed</p></div></div>
+                    </div>
+                    <button onclick="checkAndLaunch()" class="mac-btn w-full bg-ios-blue text-white py-4 rounded-2xl font-bold shadow-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"><span>Start Assessment</span><i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                `;
+            }
+            lucide.createIcons();
+            window.showScreen('screen-dashboard');
+        };
+
+        // QUIZ
+        window.checkAndLaunch = () => {
+            if (state.userData.role === 'scout' && (state.userData.attempts || 0) >= 5) {
+                showToast('Attempt limit reached (5/5). Contact leader.', 'error');
+                return;
+            }
+            window.showScreen('screen-language');
+        };
+
+        window.launchQuiz = async (lang) => {
+            state.lang = lang; state.score = 0; state.qIndex = 0;
+            showToast('Preparing questions...');
+            const snap = await get(child(ref(db), `questions/${state.userData.role}`));
+            let rawData = snap.exists() ? snap.val() : [];
+            if (!Array.isArray(rawData)) rawData = Object.values(rawData);
+            if (rawData.length === 0) { showToast('No questions found.', 'error'); return; }
+            state.questions = rawData.sort(() => 0.5 - Math.random()).slice(0, 15);
+            window.showScreen('screen-quiz');
+            loadQuestion();
+        };
+
+        const loadQuestion = () => {
+            clearInterval(state.timer);
+            const q = state.questions[state.qIndex];
+            document.getElementById('q-counter').innerText = `Q ${state.qIndex + 1} / 15`;
+            document.getElementById('quiz-progress').style.width = `${((state.qIndex + 1) / 15) * 100}%`;
+            document.getElementById('q-text').innerText = q.question[state.lang];
+            const container = document.getElementById('answers-container');
+            container.innerHTML = '';
+            let opts = q.options[state.lang].map((txt, i) => ({ txt, correct: i === 0 }));
+            opts.sort(() => 0.5 - Math.random());
+            opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "mac-btn w-full p-4 bg-white border border-gray-200 rounded-2xl text-gray-700 font-medium hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm";
+                btn.innerText = opt.txt;
+                btn.onclick = () => handleAnswer(opt.correct, btn);
+                container.appendChild(btn);
+            });
+            startTimer();
+        };
+
+        const startTimer = () => {
+            state.timeLeft = 240;
+            const display = document.getElementById('timer-text');
+            const updateTime = () => {
+                const m = Math.floor(state.timeLeft / 60); const s = state.timeLeft % 60;
+                display.innerText = `${m}:${s.toString().padStart(2, '0')}`;
+                if (state.timeLeft <= 0) { clearInterval(state.timer); nextQuestion(); }
+                state.timeLeft--;
+            };
+            updateTime(); state.timer = setInterval(updateTime, 1000);
+        };
+
+        const handleAnswer = (isCorrect, btn) => {
+            clearInterval(state.timer);
+            const allBtns = document.getElementById('answers-container').children;
+            for (let b of allBtns) b.disabled = true;
+            if (navigator.vibrate) navigator.vibrate(50);
+            if (isCorrect) { btn.className = "w-full p-4 bg-green-500 text-white rounded-2xl font-bold shadow-md transform scale-[1.02] transition-all border-none"; state.score++; audio.success.play().catch(()=>{}); } 
+            else { btn.className = "w-full p-4 bg-red-500 text-white rounded-2xl font-bold shadow-md transition-all border-none"; audio.error.play().catch(()=>{}); }
+            setTimeout(nextQuestion, 800);
+        };
+
+        const nextQuestion = () => {
+            state.qIndex++;
+            if (state.qIndex < state.questions.length) { loadQuestion(); } else { finishQuiz(); }
+        };
+
+        const finishQuiz = async () => {
+            window.showScreen('screen-result');
+            const passed = state.score >= 12;
+            document.getElementById('res-score').innerText = `${state.score} / 15`;
+            await update(ref(db, `users/${state.currentUser.uid}`), { attempts: increment(1) });
+            const actions = document.getElementById('res-actions');
+            
+            if (passed) {
+                document.getElementById('res-title').innerText = "Certified!";
+                document.getElementById('res-title').className = "text-2xl font-bold text-green-600 mb-2";
+                document.getElementById('res-msg').innerText = "You have successfully passed.";
+                document.getElementById('res-icon').innerText = "🎓";
+                const end = Date.now() + 3000;
+                (function frame() {
+                    confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 } });
+                    confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 } });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                }());
+                await update(ref(db, `users/${state.currentUser.uid}`), { examStatus: 'passed', score: state.score });
+                
+                // RED LOGOUT BUTTON FOR SUCCESS
+                actions.innerHTML = `
+                    <button onclick="generateCertificate()" class="mac-btn w-full bg-black text-white py-4 rounded-2xl font-bold shadow-lg">Download Certificate 📜</button>
+                    <button onclick="handleGlobalLogout()" class="mac-btn w-full bg-ios-red text-white py-4 rounded-2xl font-bold mt-2 shadow-md hover:bg-red-600 transition-colors">Log Out</button>
+                `;
+            } else {
+                document.getElementById('res-title').innerText = "Keep Going!";
+                document.getElementById('res-title').className = "text-2xl font-bold text-gray-800 mb-2";
+                document.getElementById('res-msg').innerText = "You need 12 correct answers.";
+                document.getElementById('res-icon').innerText = "💪";
+                
+                // RED LOGOUT BUTTON FOR FAIL
+                actions.innerHTML = `
+                    <button onclick="window.showScreen('screen-language')" class="mac-btn w-full bg-black text-white py-4 rounded-2xl font-bold shadow-lg">Try Again 🔄</button>
+                    <button onclick="handleGlobalLogout()" class="mac-btn w-full bg-ios-red text-white py-4 rounded-2xl font-bold mt-2 shadow-md hover:bg-red-600 transition-colors">Log Out</button>
+                `;
+            }
+        };
+
+        window.generateCertificate = () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+            doc.setFillColor(255, 255, 255); doc.rect(0, 0, 297, 210, 'F');
+            doc.setLineWidth(2); doc.setDrawColor(200, 200, 200); doc.rect(10, 10, 277, 190);
+            doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0); doc.setFontSize(40); doc.text("Certificate of Completion", 148.5, 60, { align: "center" });
+            doc.setFont("helvetica", "normal"); doc.setTextColor(100, 100, 100); doc.setFontSize(16); doc.text("This certifies that", 148.5, 80, { align: "center" });
+            doc.setFont("helvetica", "bold"); doc.setTextColor(0, 113, 227); doc.setFontSize(32); doc.text(state.userData.name, 148.5, 105, { align: "center" });
+            doc.setFont("helvetica", "normal"); doc.setTextColor(50, 50, 50); doc.setFontSize(14); doc.text(`has successfully completed the Safe From Harm (${state.userData.role}) Assessment`, 148.5, 125, { align: "center" });
+            doc.setTextColor(150, 150, 150); doc.setFontSize(12); doc.text(`Date: ${new Date().toLocaleDateString()}`, 148.5, 160, { align: "center" });
+            doc.save("SFH_Certificate.pdf");
+        };
+    </script>
+</body>
+</html>
