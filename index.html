@@ -40,7 +40,7 @@
     </script>
     <style>
         body {
-            background-color: #FFFFFF; /* No distinct background, pure white */
+            background-color: #FFFFFF;
             color: #1D1D1F;
             -webkit-font-smoothing: antialiased;
         }
@@ -186,8 +186,8 @@
                     <span class="text-sm font-black text-ios-blue font-mono tabular-nums bg-blue-50 px-4 py-2 rounded-full flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4"></i> <span id="timer-text">04:00</span></span>
                 </div>
                 <div id="quiz-content-wrapper" class="flex-1 flex flex-col">
-                    <h2 id="q-text" class="text-sm font-bold leading-relaxed mb-6 text-gray-900 overflow-y-auto max-h-[140px] pr-2">Loading...</h2>
-                    <div id="answers-container" class="space-y-3 mt-auto pb-12"></div>
+                    <h2 id="q-text" class="text-sm font-bold leading-relaxed mb-4 text-gray-900 overflow-y-auto max-h-[140px] pr-2">Loading...</h2>
+                    <div id="answers-container" class="space-y-3 pb-12"></div>
                 </div>
             </div>
         </div>
@@ -218,7 +218,6 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getDatabase, ref, set, get, child, update, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // 🔴 PASTE YOUR FIREBASE CONFIG HERE 🔴
         const firebaseConfig = {
             apiKey: "AIzaSyBSl1cirj-EoccG33hDP8U2c-LoS-ax1aQ",
             authDomain: "sfh-kegalle.firebaseapp.com",
@@ -384,7 +383,8 @@
             opts.sort(() => 0.5 - Math.random());
             opts.forEach(opt => {
                 const btn = document.createElement('button');
-                btn.className = "mac-btn w-full p-5 bg-gray-50 border-2 border-transparent rounded-[24px] text-gray-800 font-bold text-sm hover:bg-white hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm";
+                // උත්තර වල පසුබිම ලා කහ පාටට (bg-yellow-50) වෙනස් කළා
+                btn.className = "mac-btn w-full p-5 bg-yellow-50 border-2 border-transparent rounded-[24px] text-gray-800 font-bold text-sm hover:bg-white hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm";
                 btn.innerText = opt.txt;
                 btn.onclick = () => handleAnswer(opt.correct, btn);
                 container.appendChild(btn);
@@ -460,7 +460,6 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-            // 🔴 1. PASTE YOUR BASE64 CODE INSIDE THESE QUOTES 🔴
             const imgData = "";
             try {
                 if (imgData) {
