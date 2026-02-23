@@ -65,82 +65,113 @@
             transform: scale(0.96);
         }
 
-        /* Clean Scrollbar for Question Area */
-        ::-webkit-scrollbar { width: 3px; } 
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+        ::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #E5E7EB;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
 <body class="h-screen w-screen overflow-hidden flex justify-center">
 
     <main class="w-full max-w-[400px] h-full relative flex flex-col">
-        
-        <div id="toast-container" class="absolute top-6 left-0 right-0 z-50 flex flex-col items-center gap-2 pointer-events-none px-4"></div>
 
-        <div id="screen-auth" class="flex-1 flex flex-col justify-center px-6 py-10 animate-enter relative overflow-y-auto">
-            <div class="flex flex-col items-center mb-10">
-                <div class="w-20 h-20 bg-black text-white rounded-[1.5rem] flex items-center justify-center text-4xl mb-5 shadow-xl">
-                    ⚜️</div>
-                <h1 class="text-3xl font-black tracking-tight text-center">Safe From Harm</h1>
-                <p class="text-gray-500 text-sm font-medium mt-1 text-center">Sign in to start your journey</p>
+        <div id="toast-container"
+            class="absolute top-6 left-0 right-0 z-50 flex flex-col items-center gap-2 pointer-events-none px-4"></div>
+
+        <div id="screen-auth"
+            class="flex-1 flex flex-col justify-center px-6 py-10 animate-enter relative overflow-y-auto">
+            <div class="flex-1 flex flex-col justify-center">
+                <div class="flex flex-col items-center mb-10">
+                    <div
+                        class="w-20 h-20 bg-black text-white rounded-[1.5rem] flex items-center justify-center text-4xl mb-5 shadow-xl">
+                        ⚜️</div>
+                    <h1 class="text-3xl font-black tracking-tight text-center">Safe From Harm</h1>
+                    <p class="text-gray-500 text-sm font-medium mt-1 text-center">Sign in to start your journey</p>
+                </div>
+
+                <form id="login-form" class="space-y-4 w-full">
+                    <input type="email" id="login-email"
+                        class="mac-input w-full px-6 py-4 rounded-full outline-none font-semibold text-sm"
+                        placeholder="Email Address" required>
+                    <div class="relative">
+                        <input type="password" id="login-password"
+                            class="mac-input w-full px-6 py-4 rounded-full outline-none font-semibold text-sm"
+                            placeholder="Password" required>
+                        <button type="button" onclick="togglePassword('login-password', this)"
+                            class="absolute right-5 top-4 text-gray-400 hover:text-black transition"><i
+                                data-lucide="eye" class="w-5 h-5"></i></button>
+                    </div>
+                    <button type="submit" id="btn-login"
+                        class="mac-btn w-full bg-black text-white py-4 mt-2 rounded-full font-bold text-base shadow-lg hover:shadow-xl transition-all">Sign
+                        In</button>
+                    <p class="text-center text-sm text-gray-500 mt-6 font-medium">New here? <a href="#"
+                            onclick="toggleAuth('register')" class="text-ios-blue hover:underline font-bold">Create
+                            Account</a></p>
+                </form>
+
+                <form id="register-form" class="space-y-4 w-full hidden">
+                    <input type="text" id="reg-name"
+                        class="mac-input w-full px-6 py-4 rounded-full outline-none font-semibold text-sm"
+                        placeholder="Full Name" required>
+                    <input type="email" id="reg-email"
+                        class="mac-input w-full px-6 py-4 rounded-full outline-none font-semibold text-sm"
+                        placeholder="Email Address" required>
+                    <input type="password" id="reg-password"
+                        class="mac-input w-full px-6 py-4 rounded-full outline-none font-semibold text-sm"
+                        placeholder="Password (Min 6)" required>
+
+                    <div class="flex bg-gray-100 p-1.5 rounded-full mt-2">
+                        <label class="flex-1 cursor-pointer relative">
+                            <input type="radio" name="role" value="scout" class="peer sr-only" checked>
+                            <div
+                                class="py-3 text-center text-xs font-black text-gray-500 rounded-full peer-checked:bg-white peer-checked:text-black peer-checked:shadow transition-all duration-200">
+                                SCOUT
+                            </div>
+                        </label>
+                        <label class="flex-1 cursor-pointer relative">
+                            <input type="radio" name="role" value="leader" class="peer sr-only">
+                            <div
+                                class="py-3 text-center text-xs font-black text-gray-500 rounded-full peer-checked:bg-white peer-checked:text-black peer-checked:shadow transition-all duration-200">
+                                LEADER
+                            </div>
+                        </label>
+                        <label class="flex-1 cursor-pointer relative">
+                            <input type="radio" name="role" value="rover" class="peer sr-only">
+                            <div
+                                class="py-3 text-center text-xs font-black text-gray-500 rounded-full peer-checked:bg-white peer-checked:text-black peer-checked:shadow transition-all duration-200">
+                                ROVER
+                            </div>
+                        </label>
+                    </div>
+
+                    <button type="submit" id="btn-register"
+                        class="mac-btn w-full bg-black text-white py-4 mt-2 rounded-full font-bold text-base shadow-lg hover:shadow-xl transition-all">Create
+                        Account</button>
+                    <p class="text-center text-sm text-gray-500 mt-6 font-medium">Have an account? <a href="#"
+                            onclick="toggleAuth('login')" class="text-ios-blue hover:underline font-bold">Sign In</a>
+                    </p>
+                </form>
             </div>
 
-            <form id="login-form" class="space-y-4 w-full">
-                <input type="email" id="login-email"
-                    class="mac-input w-full px-6 py-4 rounded-full outline-none font-semibold text-sm"
-                    placeholder="Email Address" required>
-                <div class="relative">
-                    <input type="password" id="login-password"
-                        class="mac-input w-full px-6 py-4 rounded-full outline-none font-semibold text-sm"
-                        placeholder="Password" required>
-                    <button type="button" onclick="togglePassword('login-password', this)"
-                        class="absolute right-5 top-4 text-gray-400 hover:text-black transition"><i data-lucide="eye"
-                            class="w-5 h-5"></i></button>
+            <div class="mt-auto pt-10 text-center">
+                <div class="inline-flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
+                    <span class="text-[10px] font-black text-gray-800 tracking-tight uppercase">Digital Pathfinding
+                        by</span>
+                    
+                    <span class="text-[10px] font-black text-ios-blue tracking-widest uppercase">Madhawa Basnayake</span>
                 </div>
-                <button type="submit" id="btn-login"
-                    class="mac-btn w-full bg-black text-white py-4 mt-2 rounded-full font-bold text-base shadow-lg hover:shadow-xl transition-all">Sign In</button>
-                <p class="text-center text-sm text-gray-500 mt-6 font-medium">New here? <a href="#"
-                        onclick="toggleAuth('register')" class="text-ios-blue hover:underline font-bold">Create Account</a></p>
-            </form>
-
-            <form id="register-form" class="space-y-4 w-full hidden">
-                <input type="text" id="reg-name"
-                    class="mac-input w-full px-6 py-4 rounded-full outline-none font-semibold text-sm"
-                    placeholder="Full Name" required>
-                <input type="email" id="reg-email"
-                    class="mac-input w-full px-6 py-4 rounded-full outline-none font-semibold text-sm"
-                    placeholder="Email Address" required>
-                <input type="password" id="reg-password"
-                    class="mac-input w-full px-6 py-4 rounded-full outline-none font-semibold text-sm"
-                    placeholder="Password (Min 6)" required>
-
-                <div class="flex bg-gray-100 p-1.5 rounded-full mt-2">
-                    <label class="flex-1 cursor-pointer relative">
-                        <input type="radio" name="role" value="scout" class="peer sr-only" checked>
-                        <div class="py-3 text-center text-xs font-black text-gray-500 rounded-full peer-checked:bg-white peer-checked:text-black peer-checked:shadow transition-all duration-200">
-                            SCOUT
-                        </div>
-                    </label>
-                    <label class="flex-1 cursor-pointer relative">
-                        <input type="radio" name="role" value="leader" class="peer sr-only">
-                        <div class="py-3 text-center text-xs font-black text-gray-500 rounded-full peer-checked:bg-white peer-checked:text-black peer-checked:shadow transition-all duration-200">
-                            LEADER
-                        </div>
-                    </label>
-                    <label class="flex-1 cursor-pointer relative">
-                        <input type="radio" name="role" value="rover" class="peer sr-only">
-                        <div class="py-3 text-center text-xs font-black text-gray-500 rounded-full peer-checked:bg-white peer-checked:text-black peer-checked:shadow transition-all duration-200">
-                            ROVER
-                        </div>
-                    </label>
-                </div>
-
-                <button type="submit" id="btn-register"
-                    class="mac-btn w-full bg-black text-white py-4 mt-2 rounded-full font-bold text-base shadow-lg hover:shadow-xl transition-all">Create Account</button>
-                <p class="text-center text-sm text-gray-500 mt-6 font-medium">Have an account? <a href="#"
-                        onclick="toggleAuth('login')" class="text-ios-blue hover:underline font-bold">Sign In</a></p>
-            </form>
+                <p class="text-[8px] font-bold text-gray-400 mt-2 tracking-[0.2em] uppercase">Kegalle Scouts Legacy
+                    Project</p>
+            </div>
         </div>
 
         <div id="screen-dashboard"
@@ -148,20 +179,25 @@
             <button onclick="handleGlobalLogout()"
                 class="absolute top-6 right-6 p-3 rounded-full bg-gray-50 text-ios-red shadow-sm hover:bg-red-50 transition-colors mac-btn z-10"><i
                     data-lucide="log-out" class="w-5 h-5"></i></button>
-            
+
             <div class="text-center mt-6 mb-8">
-                <div class="w-24 h-24 bg-gradient-to-br from-blue-50 to-gray-100 rounded-full mx-auto flex items-center justify-center text-5xl mb-4 shadow-sm">
+                <div
+                    class="w-24 h-24 bg-gradient-to-br from-blue-50 to-gray-100 rounded-full mx-auto flex items-center justify-center text-5xl mb-4 shadow-sm">
                     👋</div>
                 <h2 class="text-4xl font-black mb-1 text-gray-900 tracking-tight" id="dash-name">Hello</h2>
-                <p class="text-xs font-bold text-ios-blue uppercase tracking-widest bg-blue-50 inline-block px-4 py-1.5 rounded-full mt-2" id="dash-role">LOADING...</p>
+                <p class="text-xs font-bold text-ios-blue uppercase tracking-widest bg-blue-50 inline-block px-4 py-1.5 rounded-full mt-2"
+                    id="dash-role">LOADING...</p>
             </div>
-            
+
             <div id="dash-content" class="space-y-4 w-full"></div>
         </div>
 
-        <div id="screen-language" class="flex-1 flex flex-col justify-center px-6 py-10 animate-enter hidden-screen relative">
-            <button onclick="showScreen('screen-dashboard')" class="absolute top-6 left-6 p-3 rounded-full bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100 mac-btn"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
-            
+        <div id="screen-language"
+            class="flex-1 flex flex-col justify-center px-6 py-10 animate-enter hidden-screen relative">
+            <button onclick="showScreen('screen-dashboard')"
+                class="absolute top-6 left-6 p-3 rounded-full bg-gray-50 text-gray-700 shadow-sm hover:bg-gray-100 mac-btn"><i
+                    data-lucide="arrow-left" class="w-5 h-5"></i></button>
+
             <div class="text-center mb-10">
                 <h2 class="text-3xl font-black mb-2 text-gray-900">Select Language</h2>
                 <p class="text-sm text-gray-500 font-medium">ඔබ කැමති භාෂාව තෝරන්න</p>
@@ -181,38 +217,36 @@
             </div>
             <div class="flex-1 flex flex-col p-6 pt-10 overflow-hidden">
                 <div class="flex justify-between items-center mb-6 shrink-0">
-                    <span class="text-xs font-black text-gray-500 bg-gray-100 px-4 py-2 rounded-full" id="q-counter">Q 1/15</span>
-                    <span class="text-sm font-black text-ios-blue font-mono tabular-nums bg-blue-50 px-4 py-2 rounded-full flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4"></i> <span id="timer-text">04:00</span></span>
+                    <span class="text-xs font-black text-gray-500 bg-gray-100 px-4 py-2 rounded-full" id="q-counter">Q
+                        1/15</span>
+                    <span
+                        class="text-sm font-black text-ios-blue font-mono tabular-nums bg-blue-50 px-4 py-2 rounded-full flex items-center gap-2"><i
+                            data-lucide="timer" class="w-4 h-4"></i> <span id="timer-text">04:00</span></span>
                 </div>
-                
+
                 <div id="quiz-content-wrapper" class="flex-1 flex flex-col min-h-0">
-                    <div class="h-1/2 overflow-y-auto pr-2 mb-4">
+                    <div class="basis-1/2 overflow-y-auto pr-2 mb-2">
                         <h2 id="q-text" class="text-sm font-bold leading-relaxed text-gray-900">Loading...</h2>
                     </div>
-                    
-                    <div id="answers-container" class="h-1/2 flex flex-col justify-start gap-2 overflow-hidden pb-12">
-                        </div>
+
+                    <div id="answers-container" class="basis-1/2 space-y-3 overflow-y-auto pb-12"></div>
                 </div>
             </div>
         </div>
 
         <div id="screen-result"
             class="flex-1 flex flex-col justify-center px-6 py-10 animate-enter hidden-screen text-center">
-            <div id="res-icon" class="text-7xl mb-6 drop-shadow-xl transition-transform hover:scale-110 duration-300">🎉</div>
+            <div id="res-icon" class="text-7xl mb-6 drop-shadow-xl transition-transform hover:scale-110 duration-300">🎉
+            </div>
             <h2 id="res-title" class="text-4xl font-black mb-2 text-gray-900 tracking-tight">Completed!</h2>
             <p id="res-msg" class="text-gray-500 text-base font-medium mb-8">Your results</p>
-            
+
             <div class="bg-gray-50 rounded-[2rem] p-8 mb-8 shadow-inner border border-gray-100 w-full mx-auto">
                 <span class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Final Score</span>
                 <div id="res-score" class="text-7xl font-black text-black mt-2 tracking-tighter">0</div>
             </div>
-            
-            <div id="res-actions" class="space-y-4 w-full mx-auto"></div>
-        </div>
 
-        <div class="absolute bottom-4 left-0 w-full text-center pointer-events-none z-40 bg-gradient-to-t from-white to-transparent pt-6">
-            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">Designed & Developed by</p>
-            <p class="text-[10px] font-black text-gray-800 tracking-widest">MADHAWA BASNAYAKE</p>
+            <div id="res-actions" class="space-y-4 w-full mx-auto"></div>
         </div>
 
     </main>
@@ -373,15 +407,14 @@
             document.getElementById('q-counter').innerText = `Q ${state.qIndex + 1} / 15`;
             document.getElementById('quiz-progress').style.width = `${((state.qIndex + 1) / 15) * 100}%`;
             document.getElementById('q-text').innerText = q.question[state.lang];
-            
+
             const container = document.getElementById('answers-container');
             container.innerHTML = '';
             let opts = q.options[state.lang].map((txt, i) => ({ txt, correct: i === 0 }));
             opts.sort(() => 0.5 - Math.random());
             opts.forEach(opt => {
                 const btn = document.createElement('button');
-                // Answer buttons use text-[11px] for small font size to fit fixed area
-                btn.className = "mac-btn w-full p-3.5 bg-yellow-50 border-2 border-transparent rounded-[20px] text-gray-800 font-bold text-[11px] hover:bg-white hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm shrink-0";
+                btn.className = "mac-btn w-full p-5 bg-yellow-50 border-2 border-transparent rounded-[24px] text-gray-800 font-bold text-sm hover:bg-white hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm shrink-0";
                 btn.innerText = opt.txt;
                 btn.onclick = () => handleAnswer(opt.correct, btn);
                 container.appendChild(btn);
@@ -406,8 +439,8 @@
             const allBtns = document.getElementById('answers-container').children;
             for (let b of allBtns) b.disabled = true;
             if (navigator.vibrate) navigator.vibrate(50);
-            if (isCorrect) { btn.className = "w-full p-3.5 bg-green-500 text-white rounded-[20px] font-bold text-[11px] shadow-md transition-all border-none"; state.score++; audio.success.play().catch(() => { }); }
-            else { btn.className = "w-full p-3.5 bg-red-500 text-white rounded-[20px] font-bold text-[11px] shadow-md transition-all border-none"; audio.error.play().catch(() => { }); }
+            if (isCorrect) { btn.className = "w-full p-5 bg-green-500 text-white rounded-[24px] font-bold text-sm shadow-md transition-all border-none"; state.score++; audio.success.play().catch(() => { }); }
+            else { btn.className = "w-full p-5 bg-red-500 text-white rounded-[24px] font-bold text-sm shadow-md transition-all border-none"; audio.error.play().catch(() => { }); }
             setTimeout(nextQuestion, 800);
         };
 
