@@ -174,20 +174,24 @@
             </div>
         </div>
 
-        <div id="screen-quiz"
-            class="flex-1 flex flex-col animate-enter hidden-screen relative">
+        <div id="screen-quiz" class="flex-1 flex flex-col animate-enter hidden-screen relative h-full overflow-hidden">
             <div class="h-1.5 w-full bg-gray-100 absolute top-0 left-0 z-20">
                 <div id="quiz-progress" class="h-full bg-ios-blue transition-all duration-500 rounded-r-full"
                     style="width: 0%"></div>
             </div>
-            <div class="flex-1 flex flex-col p-6 pt-10 overflow-y-auto">
-                <div class="flex justify-between items-center mb-8">
+            <div class="flex-1 flex flex-col p-6 pt-10 overflow-hidden">
+                <div class="flex justify-between items-center mb-6 shrink-0">
                     <span class="text-xs font-black text-gray-500 bg-gray-100 px-4 py-2 rounded-full" id="q-counter">Q 1/15</span>
                     <span class="text-sm font-black text-ios-blue font-mono tabular-nums bg-blue-50 px-4 py-2 rounded-full flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4"></i> <span id="timer-text">04:00</span></span>
                 </div>
-                <div id="quiz-content-wrapper" class="flex-1 flex flex-col">
-                    <h2 id="q-text" class="text-sm font-bold leading-relaxed mb-4 text-gray-900 overflow-y-auto max-h-[140px] pr-2">Loading...</h2>
-                    <div id="answers-container" class="space-y-3 pb-12"></div>
+                
+                <div id="quiz-content-wrapper" class="flex-1 flex flex-col min-h-0">
+                    <div class="flex-1 overflow-y-auto pr-2 mb-4">
+                        <h2 id="q-text" class="text-sm font-bold leading-relaxed text-gray-900">Loading...</h2>
+                    </div>
+                    
+                    <div id="answers-container" class="space-y-3 shrink-0 pb-12">
+                        </div>
                 </div>
             </div>
         </div>
@@ -244,7 +248,6 @@
 
         window.togglePassword = (id, btn) => {
             const input = document.getElementById(id);
-            const icon = btn.querySelector('svg');
             input.type = input.type === 'password' ? 'text' : 'password';
             btn.classList.toggle('text-black');
         };
@@ -273,7 +276,6 @@
             if (err.code === 'auth/invalid-credential') return 'Incorrect email or password';
             if (err.code === 'auth/email-already-in-use') return 'Email already registered';
             if (err.code === 'auth/weak-password') return 'Password too short';
-            if (err.message.includes('offline')) return 'No internet connection';
             return 'Something went wrong';
         };
 
@@ -338,12 +340,6 @@
                         <div class="w-full h-px bg-gray-200"></div>
                         <div class="flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-white text-purple-600 shadow-sm flex items-center justify-center"><i data-lucide="award" class="w-5 h-5"></i></div><div><p class="text-sm font-black text-gray-900">Pass Mark: 12</p><p class="text-xs font-semibold text-gray-500 mt-0.5">Correct answers needed</p></div></div>
                     </div>
-                    
-                    <a href="https://your-learning-materials-link.com" target="_blank" class="mac-btn w-full bg-white border-2 border-gray-100 text-gray-800 py-4 rounded-full font-bold text-base shadow-sm hover:bg-gray-50 hover:border-gray-200 transition-all flex items-center justify-center gap-2 mb-3">
-                        <span>📚 Access Learning Materials</span>
-                        <i data-lucide="external-link" class="w-4 h-4"></i>
-                    </a>
-
                     <button onclick="checkAndLaunch()" class="mac-btn w-full bg-ios-blue text-white py-4 rounded-full font-bold text-base shadow-lg hover:shadow-xl hover:bg-blue-600 transition-all flex items-center justify-center gap-2"><span>Start Assessment</span><i data-lucide="arrow-right" class="w-5 h-5"></i></button>
                 `;
             }
@@ -377,14 +373,14 @@
             document.getElementById('q-counter').innerText = `Q ${state.qIndex + 1} / 15`;
             document.getElementById('quiz-progress').style.width = `${((state.qIndex + 1) / 15) * 100}%`;
             document.getElementById('q-text').innerText = q.question[state.lang];
+            
             const container = document.getElementById('answers-container');
             container.innerHTML = '';
             let opts = q.options[state.lang].map((txt, i) => ({ txt, correct: i === 0 }));
             opts.sort(() => 0.5 - Math.random());
             opts.forEach(opt => {
                 const btn = document.createElement('button');
-                // උත්තර වල පසුබිම ලා කහ පාටට (bg-yellow-50) වෙනස් කළා
-                btn.className = "mac-btn w-full p-5 bg-yellow-50 border-2 border-transparent rounded-[24px] text-gray-800 font-bold text-sm hover:bg-white hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm";
+                btn.className = "mac-btn w-full p-5 bg-yellow-50 border-2 border-transparent rounded-[24px] text-gray-800 font-bold text-sm hover:bg-white hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm shrink-0";
                 btn.innerText = opt.txt;
                 btn.onclick = () => handleAnswer(opt.correct, btn);
                 container.appendChild(btn);
@@ -409,7 +405,7 @@
             const allBtns = document.getElementById('answers-container').children;
             for (let b of allBtns) b.disabled = true;
             if (navigator.vibrate) navigator.vibrate(50);
-            if (isCorrect) { btn.className = "w-full p-5 bg-green-500 text-white rounded-[24px] font-bold text-sm shadow-md transform scale-[1.02] transition-all border-none"; state.score++; audio.success.play().catch(() => { }); }
+            if (isCorrect) { btn.className = "w-full p-5 bg-green-500 text-white rounded-[24px] font-bold text-sm shadow-md transition-all border-none"; state.score++; audio.success.play().catch(() => { }); }
             else { btn.className = "w-full p-5 bg-red-500 text-white rounded-[24px] font-bold text-sm shadow-md transition-all border-none"; audio.error.play().catch(() => { }); }
             setTimeout(nextQuestion, 800);
         };
@@ -459,13 +455,8 @@
         window.generateCertificate = () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-
             const imgData = "";
-            try {
-                if (imgData) {
-                    doc.addImage(imgData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
-                }
-            } catch (e) { console.error("Image error", e); }
+            try { if (imgData) doc.addImage(imgData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST'); } catch (e) { }
 
             doc.setFont("helvetica", "bold");
             doc.setTextColor(0, 0, 0);
@@ -476,7 +467,6 @@
             doc.setFontSize(10);
             doc.setTextColor(100, 100, 100);
             doc.text(`Ref: ${certCode}`, 5, 197, { align: "left" });
-
             doc.save(`SFH_Certificate_${state.currentUser.uid.substring(0, 6)}.pdf`);
         };
     </script>
