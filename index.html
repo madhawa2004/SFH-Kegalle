@@ -65,8 +65,8 @@
             transform: scale(0.96);
         }
 
-        /* Clean Scrollbar */
-        ::-webkit-scrollbar { width: 4px; } 
+        /* Clean Scrollbar for Question Area */
+        ::-webkit-scrollbar { width: 3px; } 
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
     </style>
@@ -180,17 +180,17 @@
                     style="width: 0%"></div>
             </div>
             <div class="flex-1 flex flex-col p-6 pt-10 overflow-hidden">
-                <div class="flex justify-between items-center mb-4 shrink-0">
+                <div class="flex justify-between items-center mb-6 shrink-0">
                     <span class="text-xs font-black text-gray-500 bg-gray-100 px-4 py-2 rounded-full" id="q-counter">Q 1/15</span>
                     <span class="text-sm font-black text-ios-blue font-mono tabular-nums bg-blue-50 px-4 py-2 rounded-full flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4"></i> <span id="timer-text">04:00</span></span>
                 </div>
                 
                 <div id="quiz-content-wrapper" class="flex-1 flex flex-col min-h-0">
-                    <div class="flex-1 overflow-y-auto pr-2 mb-4 scroll-smooth">
+                    <div class="h-1/2 overflow-y-auto pr-2 mb-4">
                         <h2 id="q-text" class="text-sm font-bold leading-relaxed text-gray-900">Loading...</h2>
                     </div>
                     
-                    <div id="answers-container" class="space-y-2.5 shrink-0 pb-10">
+                    <div id="answers-container" class="h-1/2 flex flex-col justify-start gap-2 overflow-hidden pb-12">
                         </div>
                 </div>
             </div>
@@ -380,7 +380,8 @@
             opts.sort(() => 0.5 - Math.random());
             opts.forEach(opt => {
                 const btn = document.createElement('button');
-                btn.className = "mac-btn w-full p-4.5 bg-yellow-50 border-2 border-transparent rounded-[22px] text-gray-800 font-bold text-[13px] hover:bg-white hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm shrink-0";
+                // Answer buttons use text-[11px] for small font size to fit fixed area
+                btn.className = "mac-btn w-full p-3.5 bg-yellow-50 border-2 border-transparent rounded-[20px] text-gray-800 font-bold text-[11px] hover:bg-white hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm shrink-0";
                 btn.innerText = opt.txt;
                 btn.onclick = () => handleAnswer(opt.correct, btn);
                 container.appendChild(btn);
@@ -405,8 +406,8 @@
             const allBtns = document.getElementById('answers-container').children;
             for (let b of allBtns) b.disabled = true;
             if (navigator.vibrate) navigator.vibrate(50);
-            if (isCorrect) { btn.className = "w-full p-4.5 bg-green-500 text-white rounded-[22px] font-bold text-[13px] shadow-md transition-all border-none"; state.score++; audio.success.play().catch(() => { }); }
-            else { btn.className = "w-full p-4.5 bg-red-500 text-white rounded-[22px] font-bold text-[13px] shadow-md transition-all border-none"; audio.error.play().catch(() => { }); }
+            if (isCorrect) { btn.className = "w-full p-3.5 bg-green-500 text-white rounded-[20px] font-bold text-[11px] shadow-md transition-all border-none"; state.score++; audio.success.play().catch(() => { }); }
+            else { btn.className = "w-full p-3.5 bg-red-500 text-white rounded-[20px] font-bold text-[11px] shadow-md transition-all border-none"; audio.error.play().catch(() => { }); }
             setTimeout(nextQuestion, 800);
         };
 
